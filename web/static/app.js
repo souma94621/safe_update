@@ -2,6 +2,7 @@ const btn = document.getElementById("check-btn");
 const rollbackBtn = document.getElementById("rollback-btn");
 const statusEl = document.getElementById("status");
 const logEl = document.getElementById("log");
+const versionEl = document.getElementById("current-version");
 
 const STATUS_LABELS = {
     no_update: { text: "Обновлений нет", cls: "info" },
@@ -13,6 +14,13 @@ const STATUS_LABELS = {
     rollback_failed: { text: "Откат невозможен", cls: "err" },
     error: { text: "Ошибка", cls: "err" },
 };
+
+function refreshVersion() {
+    fetch("/api/version")
+        .then(r => r.json())
+        .then(d => { versionEl.textContent = d.version || "не установлена"; })
+        .catch(() => { versionEl.textContent = "—"; });
+}
 
 function renderStatus(result) {
     const label = STATUS_LABELS[result.status] || { text: result.status, cls: "info" };
@@ -55,6 +63,7 @@ btn.addEventListener("click", async () => {
     } finally {
         btn.disabled = false;
         rollbackBtn.disabled = false;
+        refreshVersion();
     }
 });
 
@@ -75,10 +84,13 @@ rollbackBtn.addEventListener("click", async () => {
     } finally {
         btn.disabled = false;
         rollbackBtn.disabled = false;
+        refreshVersion();
     }
 });
 
-// Первичная отрисовка лога
+// Первичная отрисовка лога и версии
 fetch("/api/monitor_log")
     .then(r => r.json())
     .then(d => renderLog(d.log));
+
+refreshVersion();

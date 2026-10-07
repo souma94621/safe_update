@@ -43,6 +43,9 @@ def rollback():
 def monitor_log():
     return {"log": _monitor.log}
 
+@app.get("/api/version")
+def current_version():
+    return {"version": _manager.installer.data_storage.get_active_version()}
 
 if __name__ == "__main__":
     import uvicorn

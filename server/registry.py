@@ -2,7 +2,7 @@ from pathlib import Path
 
 DIR = Path(__file__).parent.parent / "packages"
 
-version_dict = {'1.3.0' : DIR / "update_1.3.0.txt", '1.2.0' : DIR / "update_1.2.0.txt", '1.4.0' : DIR / "update_1.4.0.txt", '1.5.0' : DIR / "update_1.5.0.txt", '1.5.1' : DIR / "update_1.5.1.txt"}
+version_dict = {'1.3.0' : DIR / "update_1.3.0.txt", '1.2.0' : DIR / "update_1.2.0.txt", '1.4.0' : DIR / "update_1.4.0.txt", '1.5.0' : DIR / "update_1.5.0.txt", '1.5.1' : DIR / "update_1.5.1.txt", '2.0.0' : DIR / "update_2.0.0.txt"}
 
 def last_version():
     last = None
