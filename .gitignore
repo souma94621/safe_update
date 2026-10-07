@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+.env
+
+# Тестовый кеш
+.pytest_cache/
+
+keys/server_private.pem
+keys/server.key
+
+storage/temp/*
+storage/data/*
+!storage/temp/.gitkeep
+!storage/data/.gitkeep
