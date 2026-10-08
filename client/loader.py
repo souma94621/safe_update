@@ -23,7 +23,7 @@ class Loader():
 
     def check_version(self, current_version):
         try:
-            response = requests.post(SERVER_URL + "/version_check", json={"client_version": current_version}, verify = False)
+            response = requests.post(SERVER_URL + "/version_check", json={"client_version": current_version}, verify=str(DIR))
         except requests.exceptions.SSLError:
             raise ServerAuthError("сертификат сервера не прошёл проверку")
         except requests.exceptions.ConnectionError:
@@ -37,13 +37,12 @@ class Loader():
 
     def download(self, update_info):
         try:
-            response = requests.get(SERVER_URL + f"/package/{update_info['package_version']}", verify = False)
+            response = requests.get(SERVER_URL + f"/package/{update_info['package_version']}", verify=str(DIR))
         except requests.exceptions.SSLError:
             raise ServerAuthError("сертификат сервера не прошёл проверку")
         except requests.exceptions.ConnectionError:
             raise DownloadError("ошибка загрузки")
         
-
         if response.status_code != 200:
             raise DownloadError("ошибка загрузки")
 

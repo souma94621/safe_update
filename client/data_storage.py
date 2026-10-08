@@ -53,10 +53,16 @@ class DataStorage:
         inactive = self._inactive_slot(meta)
         slot_dir = self._slot_path(inactive)
 
-        # очистить слот перед записью
         for old_file in slot_dir.iterdir():
             if old_file.is_file():
                 old_file.unlink()
+    
+        meta["slots"][inactive] = {
+            "version": None,
+            "installed_at": None,
+        }
+        self._write_meta(meta)
+    
         filename = metadata.get("filename", "package.bin")
         with open(self._slot_path(inactive) / filename, 'wb') as f:
             f.write(package_bytes)

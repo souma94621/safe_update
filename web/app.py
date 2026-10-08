@@ -7,11 +7,11 @@ from fastapi.staticfiles import StaticFiles
 BASE = Path(__file__).parent.parent
 sys.path.insert(0, str(BASE / "client"))
 
-from main import build_system
+from main import build_system, reset_temp_storage
 
 app = FastAPI()
 
-_manager, _monitor = build_system()
+_manager, _monitor, _temp_storage = build_system()
 
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
@@ -23,6 +23,7 @@ def index():
 
 @app.post("/api/check")
 def check():
+    reset_temp_storage(_temp_storage)
     log_before = len(_monitor.log)
     result = _manager.run()
     new_entries = _monitor.log[log_before:]
@@ -30,6 +31,7 @@ def check():
 
 @app.post("/api/rollback")
 def rollback():
+    reset_temp_storage(_temp_storage)
     log_before = len(_monitor.log)
     try:
         result = _manager.installer.rollback()

@@ -21,8 +21,4 @@ class UpdateManager:
             self.current_version = result["version"]
             return {"status": "installed", "detail": result}
         except Exception as e:
-            try:
-                rb = self.installer.rollback()
-                return {"status": "install_failed_rolled_back", "error": str(e), "detail": rb}
-            except Exception as re:
-                return {"status": "install_failed", "error": str(e), "rollback_error": str(re)}
+            return {"status": "install_failed", "error": str(e)}

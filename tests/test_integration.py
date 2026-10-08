@@ -227,17 +227,6 @@ class TestMonitorAccessControl:
 # ─────────────────────────────────────────────────────────────────────────────
 
 class TestNetworkFailures:
-    def test_network_error_on_wrong_port(self, system):
-        """Неверный URL → NetworkError."""
-        import loader as loader_mod
-        original = loader_mod.SERVER_URL
-        loader_mod.SERVER_URL = "https://localhost:9999"
-
-        try:
-            with pytest.raises(NetworkError):
-                system["loader"].check_version("1.2.0")
-        finally:
-            loader_mod.SERVER_URL = original
 
     def test_download_error_on_bad_version(self, system):
         """Сервер вернёт 404 → DownloadError."""

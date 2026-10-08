@@ -20,7 +20,7 @@ def version_check(req: VersionCheckRequest):
     with open(path, 'rb') as f:
         package_bytes = f.read()
 
-    package_hash_hex, signature = crypto.sign_package(package_bytes)
+    package_hash_hex, signature = crypto.sign_package(package_bytes, latest)
 
     return {
         "available": True,

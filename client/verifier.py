@@ -15,12 +15,15 @@ def checksum(package_bytes, package_hash):
         return True
     return False
 
-def check_signature(package_bytes, signature):
+def check_signature(signature_bytes, message_hash):
+    """Проверяет подпись сообщения (версия + хеш пакета)."""
     try:
-        package_hash = hashlib.sha256(package_bytes).digest()
-        de_signature = base64.b64decode(signature)
-        public_key.verify(de_signature, package_hash, padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH), utils.Prehashed(hashes.SHA256()))
-
+        public_key.verify(
+            signature_bytes, 
+            message_hash, 
+            padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH), 
+            utils.Prehashed(hashes.SHA256())
+        )
         return True
     except InvalidSignature:
         return False
@@ -34,19 +37,32 @@ class Verifier:
     def __init__(self, view):
         self.view = view
 
-    def verify(self, current_version):
+    def verify(self, client_version):
         package_bytes, metadata = self.view.read()
-
-        checks = {
-            "checksum": checksum(package_bytes, metadata["package_hash"]["value"]),
-            "signature": check_signature(package_bytes, metadata["signature"]["value"]),
-            "version": check_version(metadata["package_version"], current_version),
-        }
-
-        if all(checks.values()):
+    
+        if not package_bytes or not metadata:
+            return {"verdict": "fail", "reason": "пакет или метаданные не найдены"}
+    
+        try:
+            package_version = metadata["package_version"]
+            package_hash_str = metadata["package_hash"]["value"]
+            signature_b64 = metadata["signature"]["value"]
+        
+            package_hash = hashlib.sha256(package_bytes).digest()
+            if package_hash.hex() != package_hash_str:
+                self.view.reject()
+                return {"verdict": "fail", "reason": "неверная контрольная сумма пакета"}
+        
+            message = hashlib.sha256(package_version.encode() + b"\n" + package_hash).digest()
+            signature = base64.b64decode(signature_b64)
+        
+            if not check_signature(signature, message):
+                self.view.reject()
+                return {"verdict": "fail", "reason": "неверная подпись"}
+            
+            # Если все проверки прошли, переводим состояние в VERIFIED
             self.view.approve()
             return {"verdict": "pass"}
-        else:
+        except Exception as e:
             self.view.reject()
-            return {"verdict": "fail", "reason": checks}
-
+            return {"verdict": "fail", "reason": str(e)}
